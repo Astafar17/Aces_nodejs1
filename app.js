@@ -1,3 +1,4 @@
+
 const express = require("express")
 const connectToDb = require("./database/databaseConnection")
 const Blog = require("./model/blogModel")
@@ -46,6 +47,24 @@ app.post("/createblog",upload.single('image') ,async (req,res)=>{
 
     res.send("Blog created successfully")
 })
+
+app.get("/blog/:id",async (req,res)=>{
+    const id = req.params.id
+    const blog = await Blog.findById(id)
+    res.render("./blog/singleBlog",{blog})
+})
+
+app.get("/deleteblog/:id",async (req,res)=>{
+    const id = req.params.id 
+    await Blog.findByIdAndDelete(id)
+    res.redirect("/")
+})
+
+
+app.get("/editBlog/:id",(req,res)=>{
+    res.render("./blog/editBlog")
+})
+
 
 app.use(express.static("./storage"))
 
