@@ -1,13 +1,13 @@
-
 const express = require("express")
 const connectToDb = require("./database/databaseConnection")
 const Blog = require("./model/blogModel")
-
+const bcrypt = require('bcrypt')
 const app = express() 
 // const multer = require("./middleware/multerConfig").multer
 // const storage = require("./middleware/multerConfig").storage
 
 const {multer,storage} = require('./middleware/multerConfig') 
+const User = require("./model/userModel")
 const upload = multer({storage : storage})
 
 connectToDb()
@@ -23,7 +23,7 @@ app.get("/home",async (req,res)=>{
 })
 
 app.get("/about",(req,res)=>{
-    const name = "MD ASTAFAR ALAM"
+    const name = "MD Astafar Alam"
     res.render("about.ejs",{name})
 })
 app.get("/createblog",(req,res)=>{
@@ -61,10 +61,58 @@ app.get("/deleteblog/:id",async (req,res)=>{
 })
 
 
-app.get("/editBlog/:id",(req,res)=>{
-    res.render("./blog/editBlog")
+app.get("/editBlog/:id",async (req,res)=>{
+    const id = req.params.id
+    // const {id} = req.params 
+  const blog =   await Blog.findById(id) 
+    res.render("./blog/editBlog",{blog})
 })
 
+app.post("/editBlog/:id",async (req,res)=>{
+    const id = req.params.id 
+    const {title,subtitle,description} = req.body 
+    await Blog.findByIdAndUpdate(id,{
+        title : title, 
+        subtitle : subtitle, 
+        description : description
+    })
+    res.redirect("/blog/" + id)
+})
+
+app.get("/register",(req,res)=>{
+    res.render("./authentication/register")
+})
+app.get("/login",(req,res)=>{
+    res.render("./authentication/login")
+})
+
+app.post("/register",async (req,res)=>{
+    const {username,email,password} = req.body 
+   await User.create({
+        username : username, 
+        email : email, 
+        password : bcrypt.hashSync(password,12)
+    })
+    res.redirect("/login")
+})
+
+app.post("/login",async (req,res)=>{
+    const {email,password} = req.body 
+  const user = await User.find({email : email})
+
+  if(user.length === 0){
+    res.send("Invalid email")
+  }else{
+    // check password now 
+    const isMatched = bcrypt.compareSync(password,user[0].password)
+    if(!isMatched){
+        res.send("Invalid password")
+    }else{
+        res.send("logged in successfully")
+    }
+  }
+
+})
 
 app.use(express.static("./storage"))
 
