@@ -13,7 +13,11 @@ const blogSchema = new Schema({
    }, 
    image : {
     type : String
-   }
+   },
+   author: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+  }
 })
 
 const Blog = mongoose.model("Blog",blogSchema)

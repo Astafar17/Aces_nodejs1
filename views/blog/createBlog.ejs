@@ -81,16 +81,13 @@
 <body>
 
 <!-- Navbar -->
-<div class="navbar">
-  <a href="#">Home</a>
-  <a href="#">About</a>
-  <a href="#">Contact</a>
-</div>
+<%- include("../components/navbar.ejs") %>
+
 
 <!-- Create Blog Form -->
 <div class="create-blog-form">
   <h2>Create Blog</h2>
-  <form action="/createblog" method="post" enctype="multipart/form-data" >
+  <form action="/createBlog" method="post" enctype="multipart/form-data" >
     <label for="title">Title:</label>
     <input type="text" id="title" name="title" required>
 
